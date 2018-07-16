@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, {Component} from 'react'
 import ReactDom from 'react-dom'
 import {render} from 'react-dom'
@@ -11,21 +12,32 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      videos: []
+      videos: [],
+      selectedVideo: null
     }
-    YTSearch({
-      key: API_Key,
-      term: 'code orange'
-    }, (videos) => {
-      this.setState({videos})
-      //only works when the key and property are the same variable name, otherwise videos:videos
-    })
+    this.videoSearch('code orange')
   }
+
+videoSearch(term){
+  YTSearch({
+    key: API_Key,
+    term: term
+  }, (videos) => {
+    this.setState({
+      videos: videos,
+      selectedVideo: videos[0]
+    })
+    //only works when the key and property are the same variable name, otherwise videos:videos
+  })
+}
+
   render() {
     return (<div>
-      <SearchBar/>
-      <VideoDetail video={this.state.videos[0]}/>
-      <VideoList videos={this.state.videos}/>
+      <SearchBar onSearchTermChange={term => this.videoSearch(term)} />
+      <VideoDetail video={this.state.selectedVideo}/>
+      <VideoList
+        onVideoSelect={selectedVideo => this.setState({selectedVideo})}
+        videos={this.state.videos}/>
     </div>)
   }
 }
